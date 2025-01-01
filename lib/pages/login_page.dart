@@ -1,11 +1,18 @@
-import 'package:expenditure_app/services/auth_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../services/auth_services.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -14,12 +21,11 @@ class LoginPage extends StatelessWidget {
         title: Text('Login'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(24.0),
+        padding: EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               TextFormField(
                 controller: _usernameController,
@@ -31,6 +37,7 @@ class LoginPage extends StatelessWidget {
                   return null;
                 },
               ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
                 decoration: InputDecoration(labelText: 'Password'),
@@ -42,27 +49,30 @@ class LoginPage extends StatelessWidget {
                   return null;
                 },
               ),
-              SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      final authService =
-                          Provider.of<AuthService>(context, listen: false);
-                      final success = await authService.login(
-                        _usernameController.text,
-                        _passwordController.text,
+              SizedBox(height: 24),
+              ElevatedButton(
+                child: Text('Login'),
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    final authService =
+                        Provider.of<AuthService>(context, listen: false);
+                    authService.login(
+                      _usernameController.text,
+                      _passwordController.text,
+                    );
+                    // Check if login was successful
+                    if (authService.isAuthenticated) {
+                      // Navigate to the main screen or show a success message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Login successful')),
                       );
-                      if (!success) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Invalid credentials')),
-                        );
-                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Invalid credentials')),
+                      );
                     }
-                  },
-                  child: Text('Login'),
-                ),
+                  }
+                },
               ),
             ],
           ),
